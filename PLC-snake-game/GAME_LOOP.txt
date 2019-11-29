@@ -1,0 +1,80 @@
+for i := 0 to 31 by 1 do
+	screen[i] := 0;
+end_for;
+
+if not left_switch and not right_switch then 'sprawdzenie dzwigni
+	if snake_direction = 2 then snake_direction := 1;
+	else snake_direction := 0;
+	end_if;
+elsif left_switch and not right_switch then
+	if snake_direction = 3 then snake_direction := 2;
+	else snake_direction := 1;
+	end_if;
+elsif left_switch and right_switch then
+	if snake_direction = 0 then snake_direction := 3;
+	else snake_direction := 2;
+	end_if;
+elsif not left_switch and right_switch then
+	if snake_direction = 1 then snake_direction := 0;
+	else snake_direction := 3;
+	end_if;
+end_if;
+
+case snake_direction of 'okreslenie przesuniecia weza
+	0: snake_y := snake_y + 1;
+	1: snake_x := snake_x + 1;
+	2: snake_y := snake_y - 1;
+	3: snake_x := snake_x - 1;
+end_case;
+
+if snake_x <= 0 then snake_x := 8; 'odpowiednie przesuniecie weza
+elsif snake_y <= 0 then snake_y := 4;
+elsif snake_x > 8 then snake_x := 1;
+elsif snake_y > 4 then snake_y := 1;
+end_if;
+
+snake_position := snake_x - 1 + ((snake_y - 1) * 8); 'nowa pozycja weza
+
+if snake_position = apple_position then 'kolizja z jablkiem
+	snake_length := snake_length + 1;
+	apple_on_snake := 1;
+	while apple_on_snake do
+		j := 0;
+		apple_position := seed_for_random_generator MOD 32;
+		for i := 0 to snake_length - 1 by 1 do
+			if apple_position = snake_tail[i] then
+				j := j + 1;
+			end_if;	
+		end_for;
+		if j = 0 then
+			apple_on_snake := 0;
+		else
+			seed_for_random_generator := seed_for_random_generator + 5;
+		end_if;
+	end_while;
+else 'jezeli nie bylo kolizji to uzuniecie ostatniej czesci ogona
+	i := snake_length - 1;
+	screen[snake_tail[i]] := 0;
+end_if;
+
+for i := 0 to snake_length - 1 by 1 do 'update weza
+	j := snake_length - i - 1;
+	k := j - 1;
+	if j > 0 then snake_tail[j] := snake_tail[k];
+	else snake_tail[00] := snake_position;
+	end_if;
+end_for;
+
+for i := 0 to snake_length - 1 by 1 do 'rysowanie weza
+	screen[snake_tail[i]] := 1;
+end_for;
+
+screen[apple_position] := 1; 'wyswietlanie jablka
+
+if snake_length > 3 then 'kolizja weza z wezem
+	for i := 3 to snake_length - 1 by 1 do
+		if snake_position = snake_tail[i] then
+			NEW_GAME();
+		end_if;
+	end_for;
+end_if;
