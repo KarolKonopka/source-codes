@@ -1,0 +1,12 @@
+for i := 0 to 31 by 1 do
+	screen[i] := 0;
+end_for;
+game_over := 0;
+apple_position := 22;
+snake_length := 1;
+snake_x := 2;
+snake_y := 2;
+snake_position := snake_x - 1 + ((snake_y - 1) * 8); 
+seed_for_random_generator := 0;
+screen[snake_position] := 1;
+screen[apple_position] := 1;
